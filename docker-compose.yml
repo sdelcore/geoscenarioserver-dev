@@ -1,0 +1,82 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PIXI_VERSION: latest
+
+    # Container name
+    container_name: geoscenario-dev
+
+    # Network mode - host networking for easier GUI and network access
+    network_mode: host
+
+    # Privileged for better hardware access (optional)
+    privileged: false
+
+    # Security options
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_PTRACE
+
+    # Environment variables
+    environment:
+      # X11 display forwarding
+      - DISPLAY=${DISPLAY}
+      - XAUTHORITY=/tmp/.Xauthority
+      # Hardware acceleration
+      - LIBGL_ALWAYS_INDIRECT=0
+      # Qt settings
+      - QT_QPA_PLATFORM=xcb
+      - QT_X11_NO_MITSHM=1
+      # XDG runtime
+      - XDG_RUNTIME_DIR=/tmp/runtime-ubuntu
+      # Pixi configuration
+      - PIXI_HOME=/home/ubuntu/.pixi
+      - PIXI_CACHE_DIR=/home/ubuntu/.cache/pixi
+      # Locale settings
+      - LANG=en_US.UTF-8
+      - LANGUAGE=en_US:en
+      - LC_ALL=en_US.UTF-8
+
+    # Volumes
+    volumes:
+      # X11 socket for GUI display
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # X authority file
+      - ${HOME}/.Xauthority:/tmp/.Xauthority:rw
+      # Project workspace
+      - .:/home/ubuntu/workspace:cached
+      # Share timezone
+      - /etc/localtime:/etc/localtime:ro
+      # DRI for hardware acceleration (if available)
+      - /dev/dri:/dev/dri:rw
+
+    # Ports for VNC access
+    ports:
+      - "5901:5901"  # VNC
+      - "6080:6080"  # noVNC web interface
+
+    # GPU support (comment out if no GPU available)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+    # Keep container running
+    stdin_open: true
+    tty: true
+
+    # Working directory
+    working_dir: /home/ubuntu/workspace
+
+    # User
+    user: ubuntu
+
+    # Command
+    command: /bin/bash

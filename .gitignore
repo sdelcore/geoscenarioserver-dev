@@ -1,0 +1,21 @@
+# Pixi Package Manager (rebuilt in container)
+**/.pixi/**
+
+# Python Cache
+**/__pycache__/**
+*.pyc
+*.pyo
+*.pyd
+**/.pytest_cache/**
+**/.mypy_cache/**
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Backup Files
+*.backup

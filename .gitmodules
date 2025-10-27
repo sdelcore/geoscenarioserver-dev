@@ -1,0 +1,4 @@
+[submodule "geoscenarioserver"]
+	path = geoscenarioserver
+	url = git@github.com:sdelcore/geoscenarioserver.git
+	branch = master

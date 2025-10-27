@@ -1,0 +1,130 @@
+{
+  "name": "GeoScenario Development Environment",
+  "dockerFile": "../Dockerfile",
+
+  // Container configuration
+  "runArgs": [
+    // X11 forwarding for GUI applications
+    "--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw",
+    // Share host network for easier debugging
+    "--network=host",
+    // GPU support if available (for graphics acceleration)
+    "--gpus=all",
+    // Security options for X11
+    "--security-opt=apparmor:unconfined",
+    "--cap-add=SYS_PTRACE"
+  ],
+
+  // Environment variables
+  "containerEnv": {
+    // X11 display forwarding
+    "DISPLAY": "${localEnv:DISPLAY}",
+    // Enable hardware acceleration
+    "LIBGL_ALWAYS_INDIRECT": "0",
+    // Qt platform
+    "QT_QPA_PLATFORM": "xcb",
+    // XDG runtime (for Wayland compatibility)
+    "XDG_RUNTIME_DIR": "/tmp/runtime-developer",
+    // Pixi settings
+    "PIXI_HOME": "/home/developer/.pixi",
+    "PIXI_CACHE_DIR": "/home/developer/.cache/pixi"
+  },
+
+  // Forward ports for VNC access (fallback GUI)
+  "forwardPorts": [5901, 6080],
+  "portsAttributes": {
+    "5901": {
+      "label": "VNC",
+      "onAutoForward": "notify"
+    },
+    "6080": {
+      "label": "noVNC Web UI",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  // VS Code settings
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash",
+            "icon": "terminal-bash"
+          }
+        },
+        "python.defaultInterpreterPath": "/opt/pixi/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black",
+        "files.watcherExclude": {
+          "**/.pixi/**": true,
+          "**/colcon_ws/build/**": true,
+          "**/colcon_ws/install/**": true,
+          "**/colcon_ws/log/**": true
+        }
+      },
+
+      // Useful extensions for the project
+      "extensions": [
+        // Python development
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "ms-python.pylint",
+        // C++ development (for Unreal modules)
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        // ROS2 support
+        "ms-iot.vscode-ros",
+        // XML/XSD for JOSM files
+        "redhat.vscode-xml",
+        // Docker support
+        "ms-azuretools.vscode-docker",
+        // Git integration
+        "eamodio.gitlens",
+        // YAML support (for docker-compose, configs)
+        "redhat.vscode-yaml",
+        // Markdown preview
+        "yzhang.markdown-all-in-one",
+        // Remote development
+        "ms-vscode-remote.remote-containers"
+      ]
+    }
+  },
+
+  // Mount points
+  "mounts": [
+    // Mount workspace
+    "type=bind,source=${localWorkspaceFolder},target=/home/ubuntu/workspace"
+  ],
+
+  // Workspace folder inside container
+  "workspaceFolder": "/home/ubuntu/workspace",
+
+  // User to run as
+  "remoteUser": "ubuntu",
+
+  // Post-create commands
+  "postCreateCommand": "echo '🚀 Development container ready! Run \"pixi install\" to set up dependencies.' && cd /home/ubuntu/workspace/geoscenarioserver && pixi install",
+
+  // Post-start commands
+  "postStartCommand": "echo '📊 GUI Display Information:' && echo \"X11 Display: $DISPLAY\" && echo 'VNC Web UI: http://localhost:6080/vnc.html' && echo '---' && echo 'Run \"pixi shell\" in geoscenarioserver/ to activate the environment'",
+
+  // Features to add (optional additional tools)
+  "features": {
+    // Git LFS support
+    "ghcr.io/devcontainers/features/git-lfs:1": {},
+    // GitHub CLI
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    // Common utilities
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": false,
+      "username": "ubuntu",
+      "upgradePackages": false
+    }
+  }
+}

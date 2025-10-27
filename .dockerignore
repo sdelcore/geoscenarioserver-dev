@@ -1,0 +1,34 @@
+# Git metadata
+.git
+.gitignore
+.gitmodules
+.gitattributes
+
+# Documentation
+*.md
+
+# GeoScenario code as this will get mounted
+geoscenarioserver/**
+
+# Pixi Package Manager (rebuilt in container)
+**/.pixi/**
+pixi.lock
+
+# Python Cache
+**/__pycache__/**
+*.pyc
+*.pyo
+*.pyd
+**/.pytest_cache/**
+**/.mypy_cache/**
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+*.backup
+.devcontainer/
